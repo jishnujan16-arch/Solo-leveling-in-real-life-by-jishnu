@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level Up In Real Life - System HUD</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .cyan-glow {
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3), inset 0 0 10px rgba(0, 240, 255, 0.15);
+            border: 1px solid rgba(0, 240, 255, 0.7);
+        }
+        .text-glow {
+            text-shadow: 0 0 8px rgba(0, 240, 255, 0.8);
+        }
+        .btn-cyan-glow:hover {
+            box-shadow: 0 0 12px rgba(0, 240, 255, 0.8);
+        }
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #050a14;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #00f0ff;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="bg-[#050a14] text-[#00f0ff] font-mono min-h-screen flex flex-col justify-center items-center p-4 md:p-8 selection:bg-[#00f0ff] selection:text-black">
+
+    <!-- SYSTEM HUD CONTAINER -->
+    <div class="w-full max-w-6xl bg-[#091322]/90 backdrop-blur-md rounded-lg p-6 cyan-glow relative overflow-hidden">
+        
+        <!-- Grid Pattern Overlay -->
+        <div class="absolute inset-0 bg-[radial-gradient(#00f0ff_1px,transparent_1px)] [background-size:16px_16px] opacity-10 pointer-events-none"></div>
+
+        <!-- HEADER -->
+        <header class="flex flex-col md:flex-row justify-between items-center border-b border-[#00f0ff]/40 pb-4 mb-6 relative z-10 gap-4">
+            <div>
+                <div class="flex items-center space-x-2">
+                    <h1 class="text-3xl font-bold tracking-widest text-glow uppercase">PLAYER: <span id="player-name-display">Jishnu</span></h1>
+                    <button onclick="changePlayerName()" class="bg-[#00f0ff]/20 text-[#00f0ff] border border-[#00f0ff] px-2 py-0.5 rounded text-[10px] font-bold hover:bg-[#00f0ff] hover:text-black transition-all">
+                        ✏️ EDIT NAME
+                    </button>
+                </div>
+                <p class="text-xs text-[#00f0ff]/70 tracking-wider">PHYSICAL TRAINING HUD // REALITY GRIND</p>
+            </div>
+            
+            <button onclick="generateDailyRoutine()" class="bg-[#00f0ff]/20 text-[#00f0ff] border border-[#00f0ff] px-3 py-1.5 rounded text-xs font-bold hover:bg-[#00f0ff] hover:text-black btn-cyan-glow transition-all">
+                🔄 NEW DAY (RANDOMIZE)
+            </button>
+        </header>
+
+        <!-- VISUAL BODY TYPE SELECTION PANEL -->
+        <div class="mb-6 bg-[#030712]/70 p-4 rounded border border-[#00f0ff]/30 relative z-10">
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="text-xs font-bold tracking-wider text-glow uppercase">[ SELECT YOUR BODY TYPE (CLICK A PICTURE) ]</h2>
+                <span id="current-body-label" class="text-xs text-amber-400 font-bold uppercase">SELECTED: MESOMORPH</span>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- ECTOMORPH CARD -->
+                <div id="card-ectomorph" onclick="selectBodyType('ectomorph')" class="cursor-pointer bg-[#050a14] p-3 rounded border border-[#00f0ff]/30 hover:border-[#00f0ff] transition-all flex flex-col items-center group relative overflow-hidden">
+                    <div class="w-24 h-36 mb-2 flex items-center justify-center border border-[#00f0ff]/20 rounded bg-[#030712] group-hover:scale-105 transition-transform">
+                        <!-- SVG Illustration matching slim body frame -->
+                        <svg class="w-16 h-28 text-[#00f0ff]/70 group-hover:text-[#00f0ff]" viewBox="0 0 100 200" fill="currentColor">
+                            <circle cx="50" cy="25" r="14" />
+                            <path d="M42,42 L58,42 L62,110 L38,110 Z" />
+                            <rect x="28" y="44" width="8" height="65" rx="3" />
+                            <rect x="64" y="44" width="8" height="65" rx="3" />
+                            <rect x="40" y="112" width="8" height="75" rx="3" />
+                            <rect x="52" y="112" width="8" height="75" rx="3" />
+                        </svg>
+                    </div>
+                    <span class="text-sm font-bold text-white group-hover:text-[#00f0ff]">ECTOMORPH</span>
+                    <span class="text-[10px] text-[#00f0ff]/60 text-center mt-1">Lean / High Reps / Hyper-Metabolic</span>
+                </div>
+
+                <!-- MESOMORPH CARD -->
+                <div id="card-mesomorph" onclick="selectBodyType('mesomorph')" class="cursor-pointer bg-[#050a14] p-3 rounded border border-[#00f0ff] cyan-glow transition-all flex flex-col items-center group relative overflow-hidden">
+                    <div class="w-24 h-36 mb-2 flex items-center justify-center border border-[#00f0ff]/20 rounded bg-[#030712] group-hover:scale-105 transition-transform">
+                        <!-- SVG Illustration matching muscular/athletic body frame -->
+                        <svg class="w-20 h-28 text-[#00f0ff] group-hover:text-[#00f0ff]" viewBox="0 0 100 200" fill="currentColor">
+                            <circle cx="50" cy="25" r="15" />
+                            <path d="M30,42 L70,42 L60,110 L40,110 Z" />
+                            <rect x="18" y="44" width="10" height="65" rx="4" />
+                            <rect x="72" y="44" width="10" height="65" rx="4" />
+                            <rect x="38" y="112" width="10" height="75" rx="4" />
+                            <rect x="52" y="112" width="10" height="75" rx="4" />
+                        </svg>
+                    </div>
+                    <span class="text-sm font-bold text-white group-hover:text-[#00f0ff]">MESOMORPH</span>
+                    <span class="text-[10px] text-[#00f0ff]/60 text-center mt-1">Athletic / Balanced / Fast Muscle Gain</span>
+                </div>
+
+                <!-- ENDOMORPH CARD -->
+                <div id="card-endomorph" onclick="selectBodyType('endomorph')" class="cursor-pointer bg-[#050a14] p-3 rounded border border-[#00f0ff]/30 hover:border-[#00f0ff] transition-all flex flex-col items-center group relative overflow-hidden">
+                    <div class="w-24 h-36 mb-2 flex items-center justify-center border border-[#00f0ff]/20 rounded bg-[#030712] group-hover:scale-105 transition-transform">
+                        <!-- SVG Illustration matching larger body frame -->
+                        <svg class="w-24 h-28 text-[#00f0ff]/70 group-hover:text-[#00f0ff]" viewBox="0 0 100 200" fill="currentColor">
+                            <circle cx="50" cy="25" r="16" />
+                            <path d="M22,42 L78,42 C85,80 80,110 64,115 L36,115 C20,110 15,80 22,42 Z" />
+                            <rect x="10" y="44" width="11" height="65" rx="5" />
+                            <rect x="79" y="44" width="11" height="65" rx="5" />
+                            <rect x="34" y="117" width="13" height="70" rx="5" />
+                            <rect x="53" y="117" width="13" height="70" rx="5" />
+                        </svg>
+                    </div>
+                    <span class="text-sm font-bold text-white group-hover:text-[#00f0ff]">ENDOMORPH</span>
+                    <span class="text-[10px] text-[#00f0ff]/60 text-center mt-1">Power / High Volume / Fat Loss Focus</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN DASHBOARD GRID -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
+
+            <!-- COLUMN 1: PLAYER VITAL & EXERCISE TASKS -->
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- LEVEL & EXP -->
+                <div class="bg-[#030712]/70 p-4 rounded border border-[#00f0ff]/30 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-lg font-bold">LEVEL: <span id="player-level" class="text-2xl text-white text-glow">1</span></span>
+                        <span class="text-xs text-[#00f0ff]/70">RANK: E-RANK ATHLETE</span>
+                    </div>
+
+                    <!-- EXP Bar -->
+                    <div>
+                        <div class="text-xs flex justify-between mb-1">
+                            <span>EXP PROGRESS</span>
+                            <span id="exp-text">0 / 100</span>
+                        </div>
+                        <div class="w-full bg-[#050a14] h-2.5 rounded-full border border-[#00f0ff]/30 overflow-hidden">
+                            <div id="exp-bar" class="bg-[#00f0ff] h-full transition-all duration-500 shadow-[0_0_8px_#00f0ff]" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 10 DAILY FITNESS EXERCISES -->
+                <div class="bg-[#030712]/70 p-4 rounded border border-[#00f0ff]/40">
+                    <div class="flex justify-between items-center border-b border-[#00f0ff]/30 pb-2 mb-3">
+                        <h2 class="text-sm md:text-base font-bold text-glow tracking-wider">[ DAILY QUEST: RANDOMIZED WORKOUT ]</h2>
+                        <span class="text-xs text-amber-400 font-bold animate-pulse">! MANDATORY</span>
+                    </div>
+
+                    <div id="quest-list" class="space-y-2 max-h-[420px] overflow-y-auto pr-1">
+                        <!-- 10 Workout tasks rendered dynamically -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- COLUMN 2: PENTAGON GRAPH, STATS & AI ASSISTANT -->
+            <div class="space-y-6 flex flex-col justify-between">
+                
+                <!-- PENTAGON RADAR GRAPH -->
+                <div class="bg-[#030712]/70 p-4 rounded border border-[#00f0ff]/30 flex flex-col items-center">
+                    <h2 class="text-xs font-bold tracking-wider text-glow uppercase mb-2">Stat Pentagon Radar</h2>
+                    
+                    <svg width="200" height="200" viewBox="0 0 200 200" class="overflow-visible">
+                        <!-- Polygon Grid Backgrounds -->
+                        <polygon points="100,20 176,75 147,165 53,165 24,75" fill="none" stroke="rgba(0,240,255,0.2)" stroke-width="1"/>
+                        <polygon points="100,45 151,82 132,142 68,142 49,82" fill="none" stroke="rgba(0,240,255,0.15)" stroke-width="1"/>
+                        <polygon points="100,70 126,89 116,119 84,119 74,89" fill="none" stroke="rgba(0,240,255,0.1)" stroke-width="1"/>
+                        
+                        <!-- Axis Lines -->
+                        <line x1="100" y1="100" x2="100" y2="20" stroke="rgba(0,240,255,0.2)"/>
+                        <line x1="100" y1="100" x2="176" y2="75" stroke="rgba(0,240,255,0.2)"/>
+                        <line x1="100" y1="100" x2="147" y2="165" stroke="rgba(0,240,255,0.2)"/>
+                        <line x1="100" y1="100" x2="53" y2="165" stroke="rgba(0,240,255,0.2)"/>
+                        <line x1="100" y1="100" x2="24" y2="75" stroke="rgba(0,240,255,0.2)"/>
+
+                        <!-- Dynamic Pentagon Shape -->
+                        <polygon id="radar-shape" points="100,80 120,90 110,120 90,120 80,90" fill="rgba(0, 240, 255, 0.35)" stroke="#00f0ff" stroke-width="2"/>
+
+                        <!-- Labels -->
+                        <text x="100" y="10" fill="#00f0ff" font-size="10" font-weight="bold" text-anchor="middle">STR</text>
+                        <text x="185" y="75" fill="#00f0ff" font-size="10" font-weight="bold" text-anchor="start">VIT</text>
+                        <text x="155" y="180" fill="#00f0ff" font-size="10" font-weight="bold" text-anchor="start">AGI</text>
+                        <text x="45" y="180" fill="#00f0ff" font-size="10" font-weight="bold" text-anchor="end">INT</text>
+                        <text x="15" y="75" fill="#00f0ff" font-size="10" font-weight="bold" text-anchor="end">PER</text>
+                    </svg>
+                </div>
+
+                <!-- STAT ALLOCATION -->
+                <div class="bg-[#030712]/70 p-3.5 rounded border border-[#00f0ff]/30">
+                    <div class="flex justify-between items-center border-b border-[#00f0ff]/20 pb-2 mb-2">
+                        <span class="text-xs font-bold text-glow">STATS</span>
+                        <span class="text-xs text-white">POINTS: <span id="stat-points" class="text-[#00f0ff] font-bold">0</span></span>
+                    </div>
+
+                    <div class="space-y-1.5 text-xs">
+                        <div class="flex justify-between items-center bg-[#050a14] p-1.5 rounded">
+                            <span>STR (Power)</span>
+                            <div class="flex items-center space-x-2"><span id="stat-str">10</span><button onclick="addStat('str')" class="bg-[#00f0ff]/20 text-[#00f0ff] border border-[#00f0ff] px-1.5 py-0.5 rounded font-bold hover:bg-[#00f0ff] hover:text-black">+</button></div>
+                        </div>
+                        <div class="flex justify-between items-center bg-[#050a14] p-1.5 rounded">
+                            <span>VIT (Stamina)</span>
+                            <div class="flex items-center space-x-2"><span id="stat-vit">10</span><button onclick="addStat('vit')" class="bg-[#00f0ff]/20 text-[#00f0ff] border border-[#00f0ff] px-1.5 py-0.5 rounded font-bold hover:bg-[#00f0ff] hover:text-black">+</button></div>
+                        </div>
+                        <div class="flex justify-between items-center bg-[#050a14] p-1.5 rounded">
+                            <span>AGI (Speed)</span>
+                            <div class="flex items-center space-x-2"><span id="stat-agi">10</span><button onclick="addStat('agi')" class="bg-[#00f0ff]/20 text-[#00f0ff] border border-[#00f0ff] px-1.5 py-0.5 rounded font-bold hover:bg-[#00f0ff] hover:text-black">+</button></div>
+                        </div>
+                        <div class="flex justify-between items-center bg-[#050a14] p-1.5 rounded">
+                            <span>INT (Willpower)</span>
+                            <div class="flex items-center space-x-2"><span id="stat-int">10</span><button onclick="addStat('int')" class="bg-[#00f0ff]/20 text-[#00f0ff] border border-[#00f0ff] px-1.5 py-0.5 rounded font-bold hover:bg-[#00f0ff] hover:text-black">+</button></div>
+                        </div>
+                        <div class="flex justify-between items-center bg-[#050a14] p-1.5 rounded">
+                            <span>PER (Focus)</span>
+                            <div class="flex items-center space-x-2"><span id="stat-per">10</span><button onclick="addStat('per')" class="bg-[#00f0ff]/20 text-[#00f0ff] border border-[#00f0ff] px-1.5 py-0.5 rounded font-bold hover:bg-[#00f0ff] hover:text-black">+</button></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI SYSTEM ASSISTANT RECOMMENDATION -->
+                <div class="bg-[#00f0ff]/10 p-3.5 rounded border border-[#00f0ff] cyan-glow">
+                    <p class="text-[10px] uppercase tracking-widest text-glow font-bold mb-1 text-center">[ AI SYSTEM ASSISTANT ]</p>
+                    <p id="ai-assistant-msg" class="text-xs text-white italic text-center">
+                        Analyzing body parameters...
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Player State
+        const playerState = {
+            name: "Jishnu",
+            level: 1,
+            exp: 0,
+            maxExp: 100,
+            points: 0,
+            bodyType: "mesomorph",
+            stats: { str: 10, vit: 10, agi: 10, int: 10, per: 10 }
+        };
+
+        // Master Exercise Pool
+        const exerciseMasterList = [
+            { id: 1, name: "Push-ups", baseReps: 25, exp: 10, type: "reps" },
+            { id: 2, name: "Bodyweight Squats", baseReps: 30, exp: 10, type: "reps" },
+            { id: 3, name: "Plank Hold", baseReps: 45, exp: 10, type: "seconds" },
+            { id: 4, name: "Walking Lunges", baseReps: 20, exp: 10, type: "reps" },
+            { id: 5, name: "Mountain Climbers", baseReps: 40, exp: 10, type: "reps" },
+            { id: 6, name: "Jumping Jacks", baseReps: 50, exp: 10, type: "reps" },
+            { id: 7, name: "Chair Dips", baseReps: 20, exp: 10, type: "reps" },
+            { id: 8, name: "High Knees", baseReps: 40, exp: 10, type: "reps" },
+            { id: 9, name: "Burpees", baseReps: 12, exp: 10, type: "reps" },
+            { id: 10, name: "Jogging or Sprinting", baseReps: 15, exp: 10, type: "minutes" },
+            { id: 11, name: "Diamond Push-ups", baseReps: 15, exp: 10, type: "reps" },
+            { id: 12, name: "Russian Twists", baseReps: 30, exp: 10, type: "reps" },
+            { id: 13, name: "Shadow Boxing", baseReps: 5, exp: 10, type: "minutes" },
+            { id: 14, name: "Wall Sit", baseReps: 60, exp: 10, type: "seconds" }
+        ];
+
+        // Change Player Name Function
+        function changePlayerName() {
+            const newName = prompt("Enter new player name:", playerState.name);
+            if (newName && newName.trim() !== "") {
+                playerState.name = newName.trim();
+                updateUI();
+                updateAIRecommendation();
+            }
+        }
+
+        // Select Body Type by Clicking Card
+        function selectBodyType(type) {
+            playerState.bodyType = type;
+            
+            // Highlight selected card and remove glow from others
+            ['ectomorph', 'mesomorph', 'endomorph'].forEach(t => {
+                const card = document.getElementById(`card-${t}`);
+                if (t === type) {
+                    card.className = "cursor-pointer bg-[#050a14] p-3 rounded border border-[#00f0ff] cyan-glow transition-all flex flex-col items-center group relative overflow-hidden";
+                } else {
+                    card.className = "cursor-pointer bg-[#050a14] p-3 rounded border border-[#00f0ff]/30 hover:border-[#00f0ff] transition-all flex flex-col items-center group relative overflow-hidden";
+                }
+            });
+
+            document.getElementById("current-body-label").innerText = `SELECTED: ${type.toUpperCase()}`;
+            
+            generateDailyRoutine();
+        }
+
+        // Generate and RANDOMIZE 10 Fitness Tasks based on chosen Body Type
+        function generateDailyRoutine() {
+            const questListEl = document.getElementById("quest-list");
+            questListEl.innerHTML = "";
+
+            // Body Type Multiplier Logic
+            let multiplier = 1.0;
+            if (playerState.bodyType === "ectomorph") multiplier = 0.85; // Lower reps, focusing on steady muscle build
+            if (playerState.bodyType === "endomorph") multiplier = 1.3;  // Higher volume/burn focus
+
+            // Shuffle master list randomly
+            const shuffledExercises = [...exerciseMasterList]
+                .sort(() => 0.5 - Math.random())
+                .slice(0, 10);
+
+            shuffledExercises.forEach((ex) => {
+                const randomFactor = 0.9 + Math.random() * 0.2;
+                const calculatedReps = Math.round(ex.baseReps * multiplier * randomFactor);
+                
+                const taskCard = document.createElement("div");
+                taskCard.className = "flex justify-between items-center bg-[#050a14] p-2 rounded border border-[#00f0ff]/20";
+                
+                let unitText = ex.type === "seconds" ? "Sec" : ex.type === "minutes" ? "Min" : "Reps";
+
+                taskCard.innerHTML = `
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="checkbox" onchange="toggleTask(this, ${ex.exp})" class="w-4 h-4 accent-[#00f0ff] bg-transparent border-[#00f0ff] rounded focus:ring-0">
+                        <span class="text-xs md:text-sm font-semibold text-white">${ex.name} (${calculatedReps} ${unitText})</span>
+                    </label>
+                    <span class="text-[10px] text-[#00f0ff]/80 font-bold">[ +${ex.exp} EXP ]</span>
+                `;
+                questListEl.appendChild(taskCard);
+            });
+
+            updateAIRecommendation();
+        }
+
+        // Dynamic AI Assistant logic reacting specifically to clicked Body Type
+        function updateAIRecommendation() {
+            const aiMsgEl = document.getElementById("ai-assistant-msg");
+            const name = playerState.name;
+
+            const aiResponses = {
+                ectomorph: [
+                    `"AI System [ECTOMORPH]: Body detected as high-metabolism slim frame. I've tailored a lower rep, high-intensity daily program for player ${name} to build lean muscle mass efficiently."`,
+                    `"AI System [ECTOMORPH]: ${name}, prioritize clean protein post-workout today to maximize muscle hyper-recovery."`
+                ],
+                mesomorph: [
+                    `"AI System [MESOMORPH]: Athletic, naturally balanced frame calibrated. ${name}, high speed and explosive power tasks assigned today."`,
+                    `"AI System [MESOMORPH]: Optimal body composition active. Push for maximum agility and strength metrics, ${name}!"`
+                ],
+                endomorph: [
+                    `"AI System [ENDOMORPH]: High volume and endurance routine deployed for ${name}. Designed to burn maximum calories and unlock core power."`,
+                    `"AI System [ENDOMORPH]: ${name}, keep your rest periods under 45 seconds to keep up metabolic furnace burn."`
+                ]
+            };
+
+            const selectedPool = aiResponses[playerState.bodyType];
+            aiMsgEl.innerText = selectedPool[Math.floor(Math.random() * selectedPool.length)];
+        }
+
+        // Checkbox Toggle EXP
+        function toggleTask(checkbox, expValue) {
+            if (checkbox.checked) {
+                gainExp(expValue);
+            } else {
+                playerState.exp = Math.max(0, playerState.exp - expValue);
+                updateUI();
+            }
+        }
+
+        // Level Up & EXP system
+        function gainExp(amount) {
+            playerState.exp += amount;
+            
+            if (playerState.exp >= playerState.maxExp) {
+                playerState.exp -= playerState.maxExp;
+                playerState.level++;
+                playerState.points += 3;
+                playerState.maxExp = Math.floor(playerState.maxExp * 1.3);
+
+                alert(`[ SYSTEM ALERT ] LEVEL UP! Player ${playerState.name} reached Level ${playerState.level}! Granted +3 Stat Points.`);
+            }
+
+            updateUI();
+        }
+
+        // Add Stat Point
+        function addStat(statKey) {
+            if (playerState.points > 0) {
+                playerState.stats[statKey]++;
+                playerState.points--;
+                updateUI();
+            }
+        }
+
+        // Draw dynamic Pentagon Radar Chart
+        function updateRadarChart() {
+            const { str, vit, agi, int, per } = playerState.stats;
+            const maxStat = Math.max(30, str, vit, agi, int, per);
+
+            const getPoint = (val, angleDeg) => {
+                const angleRad = (angleDeg - 90) * (Math.PI / 180);
+                const radius = (val / maxStat) * 75;
+                const x = 100 + radius * Math.cos(angleRad);
+                const y = 100 + radius * Math.sin(angleRad);
+                return `${x.toFixed(1)},${y.toFixed(1)}`;
+            };
+
+            const pSTR = getPoint(str, 0);
+            const pVIT = getPoint(vit, 72);
+            const pAGI = getPoint(agi, 144);
+            const pINT = getPoint(int, 216);
+            const pPER = getPoint(per, 288);
+
+            document.getElementById("radar-shape").setAttribute("points", `${pSTR} ${pVIT} ${pAGI} ${pINT} ${pPER}`);
+        }
+
+        // Refresh UI & Radar Chart
+        function updateUI() {
+            document.getElementById("player-name-display").innerText = playerState.name;
+            document.getElementById("player-level").innerText = playerState.level;
+            document.getElementById("stat-points").innerText = playerState.points;
+            
+            document.getElementById("stat-str").innerText = playerState.stats.str;
+            document.getElementById("stat-vit").innerText = playerState.stats.vit;
+            document.getElementById("stat-agi").innerText = playerState.stats.agi;
+            document.getElementById("stat-int").innerText = playerState.stats.int;
+            document.getElementById("stat-per").innerText = playerState.stats.per;
+
+            document.getElementById("exp-text").innerText = `${playerState.exp} / ${playerState.maxExp}`;
+            const expPct = (playerState.exp / playerState.maxExp) * 100;
+            document.getElementById("exp-bar").style.width = `${expPct}%`;
+
+            updateRadarChart();
+        }
+
+        // Initialize on load
+        window.onload = () => {
+            selectBodyType("mesomorph");
+            updateUI();
+        };
+    </script>
+</body>
+</html>
